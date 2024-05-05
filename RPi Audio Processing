@@ -1,0 +1,41 @@
+import speech_recognition as sr
+from datetime import date
+from gpiozero import LED
+from time import sleep
+
+red = LED(18)
+
+r = sr.Recognizer()
+mic = sr.Microphone()
+
+print("hello")
+
+while True:
+    with mic as source:
+        r.adjust_for_ambient_noise(source, duration=1)  # Adjust for ambient noise
+        print("Listening...")
+        try:
+            audio = r.listen(source, timeout=5, phrase_time_limit=5)  # 5-second timeout for listening
+        except sr.WaitTimeoutError:
+            print("Listening timed out while waiting for phrase to start")
+            continue  # Skip to the next iteration of the loop if no speech is detected
+
+
+        
+        
+    try:
+        words = r.recognize_google(audio).lower()  # Using lower to make string comparisons case-insensitive
+        print("You said:", words)
+    except sr.UnknownValueError:
+        print("Google Speech Recognition could not understand the audio")
+        continue  # Continue the loop if speech was not understood    
+
+    if "led on" in words:
+        red.on()
+
+    if "led off" in words:
+        red.off()
+
+    if "exit" in words:
+        print("Exiting...")
+        break  # Break the loop to exit the program
